@@ -1,0 +1,40 @@
+= Code4Life
+
+////
+[plantuml, diagram-classes, png]     
+....
+class BlockProcessor
+class DiagramBlock
+class DitaaBlock
+class PlantUmlBlock
+
+BlockProcessor <|-- DiagramBlock
+DiagramBlock <|-- DitaaBlock
+DiagramBlock <|-- PlantUmlBlock
+....
+////
+
+["graphviz", "sample2.png"]
+---------------------------------------------------------------------
+digraph code4life {
+  rankdir=LR;
+  node [shape = circle];
+  START_POS [ style = filled, color=lightgrey ];
+  DIAGNOSIS
+  MOLECULES
+  LABORATORY
+  #2 [ shape = doublecircle ];
+  START_POS  -> DIAGNOSIS   [ label = "  GOTO DIAGNOSIS"];
+
+  DIAGNOSIS  -> DIAGNOSIS   [ label = "  CONNECT ID"];
+  DIAGNOSIS  -> MOLECULES   [ label = "  GOTO MOLECULES"];
+  
+  MOLECULES  -> MOLECULES   [ label = "  CONNECT TYPE"];
+  MOLECULES  -> LABORATORY  [ label = "  GOTO LABORATORY"];
+  
+  LABORATORY -> LABORATORY  [ label = "  CONNECT ID"];
+  LABORATORY -> DIAGNOSIS   [ label = "  GOTO DIAGNOSIS"];
+
+  "Code4Life" [ shape = plaintext ];
+}
+---------------------------------------------------------------------
