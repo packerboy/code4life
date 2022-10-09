@@ -199,21 +199,20 @@ bool DiagnosisState::work(const vector<PlayerData> players, const vector<SampleD
     vector<SampleData> data = samples;
     std::sort(data.begin(), data.end(), greater<SampleData>());
 
-    auto carriedSamples = count_if(data.begin(), data.end(), [](auto datum){ return datum.carriedBy == 0;});
-    if (carriedSamples >= 3)
+    auto undiagnosedSampleIter = find_if(samples.begin(), samples.end(), [](auto sample)
+    {
+        return sample.carriedBy == 0 && !sample.isDiagnosed();
+    });
+
+    if (undiagnosedSampleIter != samples.end())
+    {
+        cout << "CONNECT " << undiagnosedSampleIter->sampleId << endl;
+        return true;
+    }
+    else
     {
         return false;
     }
-    for (auto datum : data)
-    {
-        if (-1 == datum.carriedBy)
-        {
-            cerr << "Download sample with id: " << datum.sampleId << " value: " << datum.value << endl;
-            cout << "CONNECT " << datum.sampleId << endl;
-            return true;
-        }
-    }
-    return false;
 }
 unique_ptr<State> DiagnosisState::next()
 {
