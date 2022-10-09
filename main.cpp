@@ -21,11 +21,63 @@ struct SampleData
     string expertiseGain;
     int health;
     vector<int> costs;
+    
+    // unoffical api
     float value;
 
     bool operator> (const SampleData& other) const
     {
         return value > other.value;
+    }
+
+    bool isDiagnosed()
+    {
+        return health > -1;
+    }
+
+    int getTotalCost()
+    {
+        if (isDiagnosed())
+        {
+            auto totalCost = 0;
+            for (const auto& cost : costs)
+            {
+                totalCost += cost;
+            }
+            return totalCost;
+        }
+        else
+        {
+            return -1;
+        }
+    }
+
+    float getValue()
+    {
+        if (isDiagnosed())
+        {
+            return static_cast<float>(health) / static_cast<float>(getTotalCost());
+        }
+        else
+        {
+            return 0.0f;
+        }
+    }
+
+    void print()
+    {
+        cerr << "============ Sample " << sampleId << " ============" << endl;
+        cerr << "Carried by: " << carriedBy << endl;
+        cerr << "Rank: " << rank << endl;
+        cerr << "Health: " << health << endl;
+        cerr << "Diagnosed:" << isDiagnosed() << endl;
+        cerr << "Value: " << getValue() << endl;
+        cerr << "Costs: ";
+        for (const auto& cost : costs)
+        {
+            cerr << cost << " ";
+        }
+        cerr << endl;
     }
 };
 
@@ -328,7 +380,7 @@ int main()
         cin >> sampleCount;
         cin.ignore();
 
-        // cerr << "Number of samples: " << sampleCount << endl;
+        cerr << "Number of samples in game: " << sampleCount << endl;
         vector<SampleData> samples;
         for (int i = 0; i < sampleCount; i++)
         {
@@ -356,8 +408,8 @@ int main()
             sample.costs.push_back(costC);
             sample.costs.push_back(costD);
             sample.costs.push_back(costE);
-            sample.value = static_cast<float>(health) / static_cast<float>((costA + costB + costC + costD + costE));
             // cerr << "ID: " << sampleId << " Points: " << health << " Points per resource: " << sample.value << endl;
+            sample.print();
 
             samples.push_back(sample);
         }
