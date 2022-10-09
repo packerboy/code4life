@@ -283,7 +283,7 @@ bool LaboratoryState::work(const vector<PlayerData> players, const vector<Sample
 }
 unique_ptr<State> LaboratoryState::next()
 {
-    return make_unique<DiagnosisState>();
+    return make_unique<SampleState>();
 }
 bool LaboratoryState::isComplete(const vector<int>& sampleCosts, const vector<int>& molecules)
 {
