@@ -328,7 +328,7 @@ int main()
         cin >> sampleCount;
         cin.ignore();
 
-        cerr << "Number of samples: " << sampleCount << endl;
+        // cerr << "Number of samples: " << sampleCount << endl;
         vector<SampleData> samples;
         for (int i = 0; i < sampleCount; i++)
         {
@@ -361,9 +361,9 @@ int main()
 
             samples.push_back(sample);
         }
-        cerr << "Input parsing time: " << chrono::duration_cast<chrono::milliseconds>(chrono::steady_clock::now() - start).count() << endl;
+        //cerr << "Input parsing time: " << chrono::duration_cast<chrono::milliseconds>(chrono::steady_clock::now() - start).count() << endl;
 
         stateMachine.advance(players, samples);
-        cerr << "Total time: " << chrono::duration_cast<chrono::milliseconds>(chrono::steady_clock::now() - start).count() << endl;
+        //cerr << "Total time: " << chrono::duration_cast<chrono::milliseconds>(chrono::steady_clock::now() - start).count() << endl;
     }
 }
