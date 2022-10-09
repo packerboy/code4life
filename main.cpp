@@ -55,6 +55,12 @@ public:
     unique_ptr<IState> next() override;
 };
 
+class SampleState : public IState
+{
+    bool work(const vector<PlayerData> players = vector<PlayerData>(), const vector<SampleData> samples = vector<SampleData>()) override;
+    unique_ptr<IState> next() override;
+};
+
 class DiagnosisState : public IState
 {
 public:
@@ -81,6 +87,30 @@ public:
 // InitialState
 // =====================
 unique_ptr<IState> InitialState::next()
+{
+    cout << "GOTO SAMPLES" << endl;
+    return make_unique<SampleState>();
+}
+
+// =====================
+// SampleState
+// =====================
+bool SampleState::work(const vector<PlayerData> players, const vector<SampleData> samples)
+{
+    /*
+    Rank 1; min value: 0.2,  max value: 3.34
+    Rank 2; min value: 2,    max value: 6
+    Rank 3; min value: 2.14, max value: 7.14
+    */
+    if (3 > count_if(samples.begin(), samples.end(), [](auto sample) { return sample.carriedBy == 0;}))
+    {
+        cout << "CONNECT " << 2 << endl;
+        return true;
+    }
+
+    return false;
+}
+unique_ptr<IState> SampleState::next()
 {
     cout << "GOTO DIAGNOSIS" << endl;
     return make_unique<DiagnosisState>();
