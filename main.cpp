@@ -36,59 +36,83 @@ struct PlayerData
     vector<int> storages;
 };
 
-class IState
+class State
 {
 public:
+    State()
+    : NAME("INITIAL")
+    {
+        cerr << "Starting at " << NAME << endl;
+    }
 
-    virtual unique_ptr<IState> next() = 0;
+    State(std::string name)
+    : NAME(name)
+    {
+        cout << "GOTO " << NAME << endl;
+    }
+
+    virtual ~State()
+    {
+        cerr << "Leaving " << NAME  << endl;
+    }
+    virtual unique_ptr<State> next() = 0;
     virtual bool work(const vector<PlayerData> players = vector<PlayerData>(), const vector<SampleData> samples = vector<SampleData>()) = 0;
-    virtual ~IState(){};
+    const std::string NAME;
 };
 
-class InitialState : public IState
+class InitialState : public State
 {
 public:
     bool work(const vector<PlayerData> players = vector<PlayerData>(), const vector<SampleData> samples = vector<SampleData>()) override
     {
         return false;
     };
-    unique_ptr<IState> next() override;
+    unique_ptr<State> next() override;
 };
 
-class SampleState : public IState
-{
-    bool work(const vector<PlayerData> players = vector<PlayerData>(), const vector<SampleData> samples = vector<SampleData>()) override;
-    unique_ptr<IState> next() override;
-};
-
-class DiagnosisState : public IState
+class SampleState : public State
 {
 public:
+    SampleState()
+    : State("SAMPLES"){}
     bool work(const vector<PlayerData> players = vector<PlayerData>(), const vector<SampleData> samples = vector<SampleData>()) override;
-    unique_ptr<IState> next() override;
+    unique_ptr<State> next() override;
 };
 
-class MoleculesState : public IState
+
+class DiagnosisState : public State
 {
 public:
+    DiagnosisState()
+    : State("DIAGNOSIS"){}
     bool work(const vector<PlayerData> players = vector<PlayerData>(), const vector<SampleData> samples = vector<SampleData>()) override;
-    unique_ptr<IState> next() override;
+    unique_ptr<State> next() override;
 };
 
-class LaboratoryState : public IState
+class MoleculesState : public State
 {
 public:
+    MoleculesState()
+    : State("MOLECULES"){}
     bool work(const vector<PlayerData> players = vector<PlayerData>(), const vector<SampleData> samples = vector<SampleData>()) override;
-    unique_ptr<IState> next() override;
+    unique_ptr<State> next() override;
+};
+
+class LaboratoryState : public State
+{
+public:
+    LaboratoryState()
+    : State("LABORATORY"){}
+    bool work(const vector<PlayerData> players = vector<PlayerData>(), const vector<SampleData> samples = vector<SampleData>()) override;
+    unique_ptr<State> next() override;
     bool isComplete(const vector<int>& sampleCosts, const vector<int>& molecules);
 };
 
 // =====================
 // InitialState
 // =====================
-unique_ptr<IState> InitialState::next()
+unique_ptr<State> InitialState::next()
 {
-    cout << "GOTO SAMPLES" << endl;
     return make_unique<SampleState>();
 }
 
@@ -110,9 +134,8 @@ bool SampleState::work(const vector<PlayerData> players, const vector<SampleData
 
     return false;
 }
-unique_ptr<IState> SampleState::next()
+unique_ptr<State> SampleState::next()
 {
-    cout << "GOTO DIAGNOSIS" << endl;
     return make_unique<DiagnosisState>();
 }
 
@@ -140,9 +163,8 @@ bool DiagnosisState::work(const vector<PlayerData> players, const vector<SampleD
     }
     return false;
 }
-unique_ptr<IState> DiagnosisState::next()
+unique_ptr<State> DiagnosisState::next()
 {
-    cout << "GOTO MOLECULES" << endl;
     return make_unique<MoleculesState>();
 }
 
@@ -184,9 +206,8 @@ bool MoleculesState::work(const vector<PlayerData> players, const vector<SampleD
 
     return false;
 }
-unique_ptr<IState> MoleculesState::next()
+unique_ptr<State> MoleculesState::next()
 {
-    cout << "GOTO LABORATORY" << endl;
     return make_unique<LaboratoryState>();
 }
 
@@ -209,10 +230,9 @@ bool LaboratoryState::work(const vector<PlayerData> players, const vector<Sample
     }
     return false;
 }
-unique_ptr<IState> LaboratoryState::next()
+unique_ptr<State> LaboratoryState::next()
 {
-    cout << "GOTO DIAGNOSIS" << endl;
-    return unique_ptr<IState>(new DiagnosisState());
+    return make_unique<DiagnosisState>();
 }
 bool LaboratoryState::isComplete(const vector<int>& sampleCosts, const vector<int>& molecules)
 {
@@ -244,7 +264,7 @@ public:
         }
     }
 
-    unique_ptr<IState> m_state;
+    unique_ptr<State> m_state;
 };
 
 int main()
