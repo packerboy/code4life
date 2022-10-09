@@ -24,7 +24,11 @@ digraph code4life {
   MOLECULES
   LABORATORY
   #2 [ shape = doublecircle ];
-  START_POS  -> DIAGNOSIS   [ label = "  GOTO DIAGNOSIS"];
+  START_POS  -> SAMPLES   [ label = "  GOTO SAMPLES"];
+
+  SAMPLES    -> SAMPLES   [ label = "  CONNECT ID"];
+  SAMPLES    -> DIAGNOSIS [ label = "  GOTO DIAGNOSIS"];
+
 
   DIAGNOSIS  -> DIAGNOSIS   [ label = "  CONNECT ID"];
   DIAGNOSIS  -> MOLECULES   [ label = "  GOTO MOLECULES"];
@@ -33,7 +37,7 @@ digraph code4life {
   MOLECULES  -> LABORATORY  [ label = "  GOTO LABORATORY"];
   
   LABORATORY -> LABORATORY  [ label = "  CONNECT ID"];
-  LABORATORY -> DIAGNOSIS   [ label = "  GOTO DIAGNOSIS"];
+  LABORATORY -> SAMPLES   [ label = "  GOTO DIAGNOSIS"];
 
   "Code4Life" [ shape = plaintext ];
 }
