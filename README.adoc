@@ -14,8 +14,8 @@ DiagramBlock <|-- PlantUmlBlock
 ....
 ////
 
-["graphviz", "sample2.png"]
----------------------------------------------------------------------
+[graphviz]
+....
 digraph code4life {
   rankdir=LR;
   node [shape = circle];
@@ -23,22 +23,22 @@ digraph code4life {
   DIAGNOSIS
   MOLECULES
   LABORATORY
-  #2 [ shape = doublecircle ];
-  START_POS  -> SAMPLES   [ label = "  GOTO SAMPLES"];
+  START_POS  -> SAMPLES   [ label = "  GOTO SAMPLES\n"];
 
   SAMPLES    -> SAMPLES   [ label = "  CONNECT ID"];
   SAMPLES    -> DIAGNOSIS [ label = "  GOTO DIAGNOSIS"];
 
 
-  DIAGNOSIS  -> DIAGNOSIS   [ label = "  CONNECT ID"];
+  DIAGNOSIS  -> DIAGNOSIS   [ label = "  CONNECT ID\ndiagnose sample\ndownload sample\nupload sample"];
   DIAGNOSIS  -> MOLECULES   [ label = "  GOTO MOLECULES"];
   
-  MOLECULES  -> MOLECULES   [ label = "  CONNECT TYPE"];
+  MOLECULES  -> MOLECULES   [ label = "  CONNECT TYPE\nget molecule"];
   MOLECULES  -> LABORATORY  [ label = "  GOTO LABORATORY"];
   
-  LABORATORY -> LABORATORY  [ label = "  CONNECT ID"];
+  LABORATORY -> LABORATORY  [ label = "  CONNECT ID\nproduce medicine"];
   LABORATORY -> SAMPLES   [ label = "  GOTO DIAGNOSIS"];
+  LABORATORY -> MOLECULES   [ label = "  GOTO MOLECULES\nget more molecules"];
 
   "Code4Life" [ shape = plaintext ];
 }
----------------------------------------------------------------------
+....
