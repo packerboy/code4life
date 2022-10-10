@@ -13,6 +13,7 @@ using namespace std;
  * Bring data on patient samples from the diagnosis machine to the laboratory with enough molecules to produce medicine!
  **/
 
+
 struct SampleData
 {
     int sampleId;
@@ -88,6 +89,9 @@ struct PlayerData
     vector<int> storages;
 };
 
+using Players = vector<PlayerData>;
+using Samples = vector<SampleData>;
+
 class State
 {
 public:
@@ -108,14 +112,14 @@ public:
         cerr << "Leaving " << NAME  << endl;
     }
     virtual unique_ptr<State> next() = 0;
-    virtual bool work(const vector<PlayerData> players = vector<PlayerData>(), const vector<SampleData> samples = vector<SampleData>()) = 0;
+    virtual bool work(const Players players = Players(), const Samples samples = Samples()) = 0;
     const std::string NAME;
 };
 
 class InitialState : public State
 {
 public:
-    bool work(const vector<PlayerData> players = vector<PlayerData>(), const vector<SampleData> samples = vector<SampleData>()) override
+    bool work(const Players players = Players(), const Samples samples = Samples()) override
     {
         return false;
     };
@@ -127,7 +131,7 @@ class SampleState : public State
 public:
     SampleState()
     : State("SAMPLES"){}
-    bool work(const vector<PlayerData> players = vector<PlayerData>(), const vector<SampleData> samples = vector<SampleData>()) override;
+    bool work(const Players players = Players(), const Samples samples = Samples()) override;
     unique_ptr<State> next() override;
 };
 
@@ -137,7 +141,7 @@ class DiagnosisState : public State
 public:
     DiagnosisState()
     : State("DIAGNOSIS"){}
-    bool work(const vector<PlayerData> players = vector<PlayerData>(), const vector<SampleData> samples = vector<SampleData>()) override;
+    bool work(const Players players = Players(), const Samples samples = Samples()) override;
     unique_ptr<State> next() override;
 };
 
@@ -146,7 +150,7 @@ class MoleculesState : public State
 public:
     MoleculesState()
     : State("MOLECULES"){}
-    bool work(const vector<PlayerData> players = vector<PlayerData>(), const vector<SampleData> samples = vector<SampleData>()) override;
+    bool work(const Players players = Players(), const Samples samples = Samples()) override;
     unique_ptr<State> next() override;
 };
 
@@ -155,7 +159,7 @@ class LaboratoryState : public State
 public:
     LaboratoryState()
     : State("LABORATORY"){}
-    bool work(const vector<PlayerData> players = vector<PlayerData>(), const vector<SampleData> samples = vector<SampleData>()) override;
+    bool work(const Players players = Players(), const Samples samples = Samples()) override;
     unique_ptr<State> next() override;
     bool isComplete(const vector<int>& sampleCosts, const vector<int>& molecules);
 };
@@ -171,7 +175,7 @@ unique_ptr<State> InitialState::next()
 // =====================
 // SampleState
 // =====================
-bool SampleState::work(const vector<PlayerData> players, const vector<SampleData> samples)
+bool SampleState::work(const Players players, const Samples samples)
 {
     /*
     Rank 1; min value: 0.2,  max value: 3.34
@@ -194,9 +198,9 @@ unique_ptr<State> SampleState::next()
 // =====================
 // DiagnosisState
 // =====================
-bool DiagnosisState::work(const vector<PlayerData> players, const vector<SampleData> samples)
+bool DiagnosisState::work(const Players players, const Samples samples)
 {
-    vector<SampleData> data = samples;
+    Samples data = samples;
     std::sort(data.begin(), data.end(), greater<SampleData>());
 
     auto undiagnosedSampleIter = find_if(samples.begin(), samples.end(), [](auto sample)
@@ -222,7 +226,7 @@ unique_ptr<State> DiagnosisState::next()
 // =====================
 // MoleculesState
 // =====================
-bool MoleculesState::work(const vector<PlayerData> players, const vector<SampleData> samples)
+bool MoleculesState::work(const Players players, const Samples samples)
 {
     const PlayerData& myPlayerData = players.at(0);
     // we are done if we are carrying 10 molecules.
@@ -231,7 +235,7 @@ bool MoleculesState::work(const vector<PlayerData> players, const vector<SampleD
         return false;
     }
 
-    vector<SampleData> data = samples;
+    Samples data = samples;
     std::sort(data.begin(), data.end(), greater<SampleData>());
 
     auto it = find_if(data.begin(), data.end(), [](auto sample){ return 0 == sample.carriedBy; });
@@ -265,9 +269,9 @@ unique_ptr<State> MoleculesState::next()
 // =====================
 // LaboratoryState
 // =====================
-bool LaboratoryState::work(const vector<PlayerData> players, const vector<SampleData> samples)
+bool LaboratoryState::work(const Players players, const Samples samples)
 {
-    vector<SampleData> data = samples;
+    Samples data = samples;
     std::sort(data.begin(), data.end(), greater<SampleData>());
 
     auto it = find_if(data.begin(), data.end(), [](auto sample){ return 0 == sample.carriedBy; });
@@ -307,7 +311,7 @@ public:
     {
     }
 
-    void advance(const vector<PlayerData>& players, const vector<SampleData>& samples)
+    void advance(const Players& players, const Samples& samples)
     {
         if (!m_state->work(players, samples))
         {
@@ -340,7 +344,7 @@ int main()
     while (1)
     {
         const chrono::time_point<std::chrono::steady_clock> start = chrono::steady_clock::now();
-        vector<PlayerData> players;
+        Players players;
         for (int i = 0; i < 2; i++)
         {
             string target;
@@ -380,7 +384,7 @@ int main()
         cin.ignore();
 
         cerr << "Number of samples in game: " << sampleCount << endl;
-        vector<SampleData> samples;
+        Samples samples;
         for (int i = 0; i < sampleCount; i++)
         {
             int sampleId;
